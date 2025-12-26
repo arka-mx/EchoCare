@@ -91,12 +91,7 @@ Plan:
       }
     );
     const soap = response.data.choices[0].message.content;
-    const date =
-      new Date().getDate() +
-      "/" +
-      new Date().getMonth() +
-      "/" +
-      new Date().getFullYear();
+    const date = new Date().toLocaleDateString("en-IN");
     await Consultation.create({
       email: email,
       transcription: transcriptValue,
@@ -112,4 +107,14 @@ Plan:
     console.error(err);
     return res.status(500).json({ msg: "SOAP generation failed" });
   }
+};
+
+export const updateSoap = async (req, res) => {
+  const email = jwt.verify(req.cookies.user, process.env.JWT_SECRET).user;
+  const { newSoap, id } = req.body;
+  await Consultation.updateOne({ _id: id }, { soap: newSoap });
+  const consultations = await Consultation.find({ email: email });
+  return res
+    .status(200)
+    .json({ msg: "soap saved", consultations: [...consultations].reverse() });
 };
