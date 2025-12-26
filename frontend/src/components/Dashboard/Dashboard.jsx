@@ -9,10 +9,16 @@ import {
   Save,
   SquarePen,
   Sparkles,
+  Pencil,
 } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import { Toaster } from "react-hot-toast";
 import toast from "react-hot-toast";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -32,8 +38,12 @@ function Dashboard() {
   const [isSoapEditable, setIsSoapEditable] = useState(false);
   const [isSoapSaving, setIsSoapSaving] = useState(false);
   const [AITranscriptShowValue, setAITranscriptShowValue] = useState("");
-  const [isAIEnhancing,setIsAIEnhancing]=useState(false);
-  const [isAITranscriptVisible,setIsAITranscriptVisible]=useState(false);
+  const [isAIEnhancing, setIsAIEnhancing] = useState(false);
+  const [isAITranscriptVisible, setIsAITranscriptVisible] = useState(false);
+  const [isEditTitleDialogOpen, setIsEditTitleDialogOpen] = useState(false);
+  const [titleEditId,setTitleEditId]=useState("");
+  const [isTitleSaving,setIsTitleSaving]=useState(false);
+  const [defaultTitleValue,setDefaultTitleValue]=useState("");
   const soapContentRef = useRef(null);
 
   useEffect(() => {
@@ -94,7 +104,7 @@ function Dashboard() {
       setIsRecording(false);
       if (transcriptValue.trim() === "") return;
       toast.success(
-        "Session is send to our AI! Please wait for a few seconds",
+        "Session is send to our AI! Please wait for a few seconds. After that please give a title to the session",
         { duration: 5000 }
       );
       try {
@@ -182,8 +192,26 @@ function Dashboard() {
                   className="w-fit h-fit p-5 flex flex-col gap-3 items-start shadow-[0_0_4px_gray] duration-300 hover:-translate-y-1 hover:translate-x-1 hover:shadow-[0_0_10px_gray] rounded-lg"
                   key={index}
                 >
-                  <h2 className="font-semibold">Date: {consultation.date}</h2>
-                  <h3 className="flex">
+                  <div className="flex items-center justify-between gap-4 w-full">
+                    <h2 className="font-semibold">
+                      {consultation.title === ""
+                        ? "Title_" + consultation.date
+                        : consultation.title}
+                    </h2>
+                    <Pencil
+                      className="stroke-neutral-500 cursor-pointer hover:stroke-neutral-700"
+                      size={14}
+                      onClick={() => {
+                        setIsEditTitleDialogOpen(true);
+                        setTitleEditId(consultation._id);
+                        setDefaultTitleValue(consultation.title);
+                      }}
+                    />
+                  </div>
+                  <h2 className="text-neutral-400 mb-[-0.5rem]">
+                    Date: {consultation.date}
+                  </h2>
+                  <h3 className="flex text-neutral-400">
                     <p className="text-neutral-400">Duration:&nbsp;</p>{" "}
                     {consultation.duration}
                   </h3>
@@ -229,39 +257,56 @@ function Dashboard() {
           </div>
           <h1 className="text-[#2E384A] text-[1.8rem] font-semibold flex items-center w-full justify-between gap-3">
             <div className="">Transcript</div>
-            <div className={`text-[1rem] mt-2 flex gap-1 items-center bg-blue-100 px-2 py-1 rounded-lg cursor-pointer duration-300 hover:bg-blue-200 ${isAIEnhancing?"pointer-events-none bg-gray-300":""}`}
-            onClick={async ()=>{
-              try{
-                setIsAIEnhancing(true);
-                toast.success("AI Enhancing has started...")
-                const res=await axios.post(BACKEND_URL+"/dashboard/enhance-transcript",{transcript:transcriptShowValue,id:consultationId},{withCredentials:true});
-                setConsultations(res.data.consultations)
-                setAITranscriptShowValue(res.data.AITranscript);
-                setIsAIEnhancing(false);
-                toast.success("Transcript enhanced with AI!");
-              }catch(e){
-                console.log(e);
-              }
-            }}>
+            <div
+              className={`text-[1rem] mt-2 flex gap-1 items-center bg-blue-100 px-2 py-1 rounded-lg cursor-pointer duration-300 hover:bg-blue-200 ${
+                isAIEnhancing ? "pointer-events-none bg-gray-300" : ""
+              }`}
+              onClick={async () => {
+                try {
+                  setIsAIEnhancing(true);
+                  toast.success("AI Enhancing has started...");
+                  const res = await axios.post(
+                    BACKEND_URL + "/dashboard/enhance-transcript",
+                    { transcript: transcriptShowValue, id: consultationId },
+                    { withCredentials: true }
+                  );
+                  setConsultations(res.data.consultations);
+                  setAITranscriptShowValue(res.data.AITranscript);
+                  setIsAIEnhancing(false);
+                  toast.success("Transcript enhanced with AI!");
+                } catch (e) {
+                  console.log(e);
+                }
+              }}
+            >
               <Sparkles size={16} />
               {AITranscriptShowValue === "" ? "AI Enhance" : "Re-Enhance"}
             </div>
           </h1>
-          <p className="items-start w-full text-neutral-500 italic">(This transcript is auto-generated from speech and may contain inaccuracies)</p>
-          {AITranscriptShowValue!=="" && <div className="self-start flex items-center gap-2 bg-blue-200 px-2 py-1 rounded-lg font-semibold">
-            <input
-              type="checkbox"
-              className="w-[1rem] h-[1rem] cursor-pointer"
-              id="show-ai-transcript"
-              onChange={(e)=>{
-                setIsAITranscriptVisible(e.currentTarget.checked);
-              }}
-            />
-            <label htmlFor="show-ai-transcript" className="cursor-pointer">
-              Show AI Version
-            </label>
-          </div>}
-          <pre className="text-[1.1rem] font-sans whitespace-pre-wrap mt-5 pb-10">{!isAITranscriptVisible?transcriptShowValue:AITranscriptShowValue}</pre>
+          <p className="items-start w-full text-neutral-500 italic">
+            (This transcript is auto-generated from speech and may contain
+            inaccuracies)
+          </p>
+          {AITranscriptShowValue !== "" && (
+            <div className="self-start flex items-center gap-2 bg-blue-200 px-2 py-1 rounded-lg font-semibold">
+              <input
+                type="checkbox"
+                className="w-[1rem] h-[1rem] cursor-pointer"
+                id="show-ai-transcript"
+                onChange={(e) => {
+                  setIsAITranscriptVisible(e.currentTarget.checked);
+                }}
+              />
+              <label htmlFor="show-ai-transcript" className="cursor-pointer">
+                Show AI Version
+              </label>
+            </div>
+          )}
+          <pre className="text-[1.1rem] font-sans whitespace-pre-wrap mt-5 pb-10">
+            {!isAITranscriptVisible
+              ? transcriptShowValue
+              : AITranscriptShowValue}
+          </pre>
         </div>
       )}
 
@@ -375,6 +420,38 @@ function Dashboard() {
           </div>
         </div>
       )}
+
+      <Dialog
+        open={isEditTitleDialogOpen}
+        onClose={() => {
+          setIsEditTitleDialogOpen(false);
+        }}
+      >
+        <DialogTitle>Edit Consultation Title</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Create or Edit the consultation title. This will help to find and track them easily.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <form className="flex flex-col gap-3 w-full px-4 pb-2 mt-[-1rem]" onSubmit={async (e)=>{
+            e.preventDefault();
+            setIsTitleSaving(true);
+            try{
+              const res=await axios.post(BACKEND_URL+"/dashboard/edit-title",{id:titleEditId, title:e.currentTarget[0].value},{withCredentials:true});
+              toast.success("Title saved!",{duration:3000});
+              setIsTitleSaving(false);
+              setConsultations(res.data.consultations);
+              setIsEditTitleDialogOpen(false);
+            }catch(e){
+              console.log(e);
+            }
+          }}>
+            <input type="text" className="border outline-none px-2 py-1" required defaultValue={defaultTitleValue} placeholder="Consultation Title" />
+            <button type="submit" className={`bg-[#3C73D0] text-white py-1 rounded-md hover:opacity-90 cursor-pointer ${isTitleSaving?"bg-neutral-400 pointer-events-none":""}`} >{isTitleSaving?"Saving...":"Save Title"}</button>
+          </form>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
