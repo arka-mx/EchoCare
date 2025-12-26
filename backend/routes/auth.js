@@ -6,6 +6,6 @@ const router=express.Router();
 router.post("/login",login);
 router.post("/check-login",checkLogin);
 router.post("/signout",signout);
-router.post("/health",health);
+router.get("/health",health);
 
 export default router;
