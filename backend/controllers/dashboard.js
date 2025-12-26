@@ -119,3 +119,77 @@ export const updateSoap = async (req, res) => {
     .status(200)
     .json({ msg: "soap saved", consultations: [...consultations].reverse() });
 };
+
+export const enhanceTranscript = async (req, res) => {
+  const email = jwt.verify(req.cookies.user, process.env.JWT_SECRET).user;
+  const { transcript, id } = req.body;
+  const prompt = `You are a medical documentation assistant.
+
+Your task is to ENHANCE the readability of a raw speech-to-text transcript
+from a doctor–patient consultation.
+
+IMPORTANT RULES:
+- Do NOT add new medical information.
+- Do NOT remove any information.
+- Do NOT infer diagnoses, medications, or advice that are not explicitly spoken.
+- Do NOT correct medical facts.
+- Do NOT assume speaker roles unless strongly implied by the sentence itself.
+
+WHAT YOU SHOULD DO:
+- Add punctuation.
+- Fix obvious speech-to-text errors.
+- Break the text into short, readable sentences.
+- Separate the conversation into logical conversational turns.
+- If speaker roles are reasonably clear, prefix lines with "Doctor:" or "Patient:".
+- If speaker role is unclear, leave the line without a role prefix.
+
+STYLE:
+- Neutral, clinical, professional.
+- No emojis.
+- No explanations.
+- No summaries.
+
+OUTPUT FORMAT:
+- Plain text only.
+- Each sentence or turn on a new line.
+- No markdown, no bullet points.
+
+This is a readability enhancement only, not a clinical interpretation.
+
+Raw transcript:
+${transcript}
+`;
+  try {
+    const response = await axios.post(
+      "https://api.perplexity.ai/chat/completions",
+      {
+        model: "sonar",
+        messages: [
+          {
+            role: "system",
+            content: "You are a medical documentation assistant.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.2,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const AITranscript = response.data.choices[0].message.content;
+    await Consultation.updateOne({ _id: id }, { AITranscription: AITranscript });
+    const consultations = await Consultation.find({ email: email });
+    return res
+      .status(200)
+      .json({ msg: "Transcript AI Enhanced", consultations: [...consultations].reverse(), AITranscript:AITranscript });
+  } catch (e) {
+    console.log(e);
+  }
+};

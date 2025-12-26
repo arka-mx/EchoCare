@@ -2,7 +2,14 @@ import MainNavbar from "../MainNavbar";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Mic, X, ArrowDownToLine, Save, SquarePen } from "lucide-react";
+import {
+  Mic,
+  X,
+  ArrowDownToLine,
+  Save,
+  SquarePen,
+  Sparkles,
+} from "lucide-react";
 import html2pdf from "html2pdf.js";
 import { Toaster } from "react-hot-toast";
 import toast from "react-hot-toast";
@@ -23,6 +30,10 @@ function Dashboard() {
   const [soapShowValue, setSoapShowValue] = useState("");
   const [consultationId, setConsultationId] = useState("");
   const [isSoapEditable, setIsSoapEditable] = useState(false);
+  const [isSoapSaving, setIsSoapSaving] = useState(false);
+  const [AITranscriptShowValue, setAITranscriptShowValue] = useState("");
+  const [isAIEnhancing,setIsAIEnhancing]=useState(false);
+  const [isAITranscriptVisible,setIsAITranscriptVisible]=useState(false);
   const soapContentRef = useRef(null);
 
   useEffect(() => {
@@ -82,6 +93,10 @@ function Dashboard() {
       recognitionRef.current.stop();
       setIsRecording(false);
       if (transcriptValue.trim() === "") return;
+      toast.success(
+        "Session is send to our AI! Please wait for a few seconds",
+        { duration: 5000 }
+      );
       try {
         const res = await axios.post(
           BACKEND_URL + "/dashboard/get-soap",
@@ -149,7 +164,7 @@ function Dashboard() {
           }`}
           defaultValue={transcriptValue}
         >
-          <div className="text-neutral-500">Transcription</div>
+          <div className="text-neutral-500">Raw Transcription</div>
           {transcriptValue}
         </div>
 
@@ -187,6 +202,10 @@ function Dashboard() {
                     onClick={() => {
                       setIsTranscriptVisible(true);
                       setTranscriptShowValue(consultation.transcription);
+                      setAITranscriptShowValue(consultation.AITranscription);
+                      setConsultationId(consultation._id);
+                      setIsAIEnhancing(false);
+                      setIsAITranscriptVisible(false);
                     }}
                   >
                     Transcript
@@ -208,10 +227,40 @@ function Dashboard() {
           >
             <X />
           </div>
-          <h1 className="text-[#2E384A] text-[1.8rem] font-semibold">
-            Transcript
+          <h1 className="text-[#2E384A] text-[1.8rem] font-semibold flex items-center w-full justify-between gap-3">
+            <div className="">Transcript</div>
+            <div className={`text-[1rem] mt-2 flex gap-1 items-center bg-blue-100 px-2 py-1 rounded-lg cursor-pointer duration-300 hover:bg-blue-200 ${isAIEnhancing?"pointer-events-none bg-gray-300":""}`}
+            onClick={async ()=>{
+              try{
+                setIsAIEnhancing(true);
+                toast.success("AI Enhancing has started...")
+                const res=await axios.post(BACKEND_URL+"/dashboard/enhance-transcript",{transcript:transcriptShowValue,id:consultationId},{withCredentials:true});
+                setConsultations(res.data.consultations)
+                setAITranscriptShowValue(res.data.AITranscript);
+                setIsAIEnhancing(false);
+                toast.success("Transcript enhanced with AI!");
+              }catch(e){
+                console.log(e);
+              }
+            }}>
+              <Sparkles size={16} />
+              {AITranscriptShowValue === "" ? "AI Enhance" : "Re-Enhance"}
+            </div>
           </h1>
-          <p className="text-[1.1rem]">{transcriptShowValue}</p>
+          {AITranscriptShowValue!=="" && <div className="self-start flex items-center gap-2 bg-blue-200 px-2 py-1 rounded-lg font-semibold">
+            <input
+              type="checkbox"
+              className="w-[1rem] h-[1rem] cursor-pointer"
+              id="show-ai-transcript"
+              onChange={(e)=>{
+                setIsAITranscriptVisible(e.currentTarget.checked);
+              }}
+            />
+            <label htmlFor="show-ai-transcript" className="cursor-pointer">
+              Show AI Version
+            </label>
+          </div>}
+          <pre className="text-[1.1rem] font-sans whitespace-pre-wrap mt-5">{!isAITranscriptVisible?transcriptShowValue:AITranscriptShowValue}</pre>
         </div>
       )}
 
@@ -230,15 +279,19 @@ function Dashboard() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              className="px-3 py-[0.1rem] border-2 border-[#3C73D0] rounded-md flex items-center gap-1 text-[#3C73D0] cursor-pointer"
+              className={`px-3 py-[0.1rem] border-2 border-[#3C73D0] rounded-md flex items-center gap-1 text-[#3C73D0] cursor-pointer ${
+                isSoapSaving ? "pointer-events-none" : ""
+              }`}
               onClick={async () => {
-                if(!isSoapEditable){
+                if (!isSoapEditable) {
                   soapContentRef.current.focus();
                   setIsSoapEditable(true);
                   return;
                 }
                 if (consultationId == "") return;
                 try {
+                  setIsSoapSaving(true);
+                  setIsSoapEditable(false);
                   const res = await axios.post(
                     BACKEND_URL + "/dashboard/update-soap",
                     {
@@ -248,21 +301,26 @@ function Dashboard() {
                     { withCredentials: true }
                   );
                   setConsultations(res.data.consultations);
-                  setIsSoapEditable(false)
+                  setIsSoapEditable(false);
+                  setIsSoapSaving(false);
                   toast.success("SOAP successfully saved!");
                 } catch (e) {
                   console.log(e);
                 }
               }}
             >
-              {isSoapEditable && <p className="flex items-center gap-1">
-                <Save size={16} />
-                Save Edits
-              </p>}
-              {!isSoapEditable && <p className="flex items-center gap-1">
-                <SquarePen size={16} />
-                Edit Soap
-              </p>}
+              {isSoapEditable && (
+                <p className="flex items-center gap-1">
+                  <Save size={16} />
+                  Save Edits
+                </p>
+              )}
+              {!isSoapEditable && (
+                <p className={"flex items-center gap-1"}>
+                  <SquarePen size={16} />
+                  {!isSoapSaving ? "Edit Soap" : "Saving..."}
+                </p>
+              )}
             </button>
             <button
               className="bg-[#3C73D0] px-3 text-white py-1 flex gap-1 items-center rounded-md hover:opacity-90 cursor-pointer
@@ -296,10 +354,17 @@ function Dashboard() {
           </div>
           <div id="soap-note" className="flex flex-col items-center mt-4">
             <h1 className="text-[#2E384A] text-[1.8rem] font-semibold">
-              SOAP Note (Generated by AI)
+              SOAP Note
+            </h1>
+            <h1 className="text-[#6b6b6b] text-[0.9rem] italic text-center">
+              (Generated by EchoCare AI · Requires clinician review)
             </h1>
             <pre
-              className={`text-[1.1rem] font-sans p-10 whitespace-pre-wrap outline-none ${isSoapEditable?"bg-blue-100 rounded-md border border-blue-500 mt-5":""}`}
+              className={`text-[1.1rem] font-sans p-10 px-2 whitespace-pre-wrap outline-none ${
+                isSoapEditable
+                  ? "bg-blue-100 rounded-md border border-blue-500 mt-5"
+                  : ""
+              }`}
               suppressContentEditableWarning
               contentEditable={isSoapEditable}
               ref={soapContentRef}
