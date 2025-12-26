@@ -110,13 +110,13 @@ function Dashboard() {
     <div className="flex w-full flex-col items-start">
       <Toaster position="top-center" reverseOrder={false} />
       <MainNavbar />
-      <div className="mx-30">
-        <h1 className="mt-10 text-[2rem] font-semibold text-[#2E384A]">
-          Welcome back Dr. {docName}
-        </h1>
+      <div className="ml-20 mr-20 [@media(max-width:418px)]:mx-10">
+        <div className="mt-10 text-[2rem] font-semibold text-[#2E384A] flex items-center gap-2 flex-wrap [@media(max-width:418px)]:text-[1.5rem]">
+          <div>Welcome back</div> <div>Dr. {docName}</div>
+        </div>
         <div className="flex items-center flex-wrap gap-2 mt-10">
           <button
-            className="flex gap-2 items-center bg-[#3C73D0] text-white px-5 py-2 text-[1.1rem] rounded-md cursor-pointer hover:opacity-90"
+            className="flex gap-2 items-center bg-[#3C73D0] text-white px-5 py-2 text-[1.1rem] rounded-md cursor-pointer hover:opacity-90 [@media(max-width:418px)]:text-[1rem] [@media(max-width:418px)]:px-3"
             onClick={handleStartConsultationClick}
           >
             {!isRecording && <Mic className="" />}
@@ -124,7 +124,7 @@ function Dashboard() {
             {isRecording && (
               <div className="flex items-center gap-3">
                 <div className="w-4 h-4 bg-red-300 rounded-full animate-pulse"></div>
-                <p>Stop Recording and get SOAP</p>
+                <p>Stop and get SOAP</p>
               </div>
             )}
           </button>
@@ -153,18 +153,18 @@ function Dashboard() {
           {transcriptValue}
         </div>
 
-        <h2 className="mt-10 text-[1.5rem] text-[#2E384A] font-semibold">
+        <h2 className="mt-10 text-[1.5rem] text-[#2E384A] font-semibold [@media(max-width:418px)]:text-[1.1rem]">
           Recent Consultations
         </h2>
         {consultations.length == 0 && (
           <div className="mt-5 text-neutral-500">No recent consultations</div>
         )}
         {consultations.length !== 0 && (
-          <div className="flex gap-5 flex-wrap items-center mt-5">
+          <div className="flex gap-8 flex-wrap items-center mt-5 pb-10">
             {consultations.map((consultation, index) => {
               return (
                 <div
-                  className="w-fit h-fit p-5 flex flex-col gap-3 items-start shadow-[0_0_4px_gray] duration-300 hover:-translate-y-1 hover:translate-x-1 hover:shadow-[0_0_10px_gray]"
+                  className="w-fit h-fit p-5 flex flex-col gap-3 items-start shadow-[0_0_4px_gray] duration-300 hover:-translate-y-1 hover:translate-x-1 hover:shadow-[0_0_10px_gray] rounded-lg"
                   key={index}
                 >
                   <h2 className="font-semibold">Date: {consultation.date}</h2>

@@ -22,12 +22,12 @@ function MainNavbar() {
   };
 
   return (
-    <div className="bg-[#F5F6FB] w-full h-[4.5rem] flex items-center pl-17 justify-between">
+    <div className="bg-[#F5F6FB] w-full h-[4.5rem] flex items-center pl-10 justify-between">
       <Link to="/dashboard">
         <img src="../../logo.png" alt="logo" className="w-[10rem]" />
       </Link>
       <button
-        className="mr-20 text-[#5d8ace] hover:underline cursor-pointer"
+        className="mr-10 text-[#5d8ace] hover:underline cursor-pointer"
         onClick={handleSignout}
       >
         Sign out
