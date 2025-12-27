@@ -373,6 +373,42 @@ function Working() {
 
       </div>
 
+
+      {/* --- DIARIZATION SECTION (TRANSCRIPT TO SPEECH) --- */}
+      <div className="max-w-6xl mx-auto px-6 mb-32">
+        <div className="bg-white/50 backdrop-blur-xl rounded-[3rem] p-8 md:p-12 border border-[#DBC6AE]/30 relative overflow-hidden">
+          {/* Background Blob */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#2E5674]/5 to-[#DBC6AE]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+          <div className="grid lg:grid-cols-2 gap-16 items-center relative z-10 text-left">
+
+            {/* Text Side (Left) */}
+            <div className="space-y-6 order-2 lg:order-1">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2E5674]/10 text-[#2E5674] font-bold text-sm">
+                <UserCheck size={16} />
+                <span>Speaker Diarization</span>
+              </div>
+              <DiarizationGraphics />
+              <h2 className="text-3xl md:text-4xl font-extrabold text-[#192E46] leading-tight">
+                Who said what? <br /> <span className="text-[#2E5674]">Perfectly Clear.</span>
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                EchoCare intelligently distinguishes between multiple speakers, separating doctor instructions from patient concerns with high precision.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Badge icon={<User size={14} />} text="Multi-Speaker" />
+                <Badge icon={<Wand2 size={14} />} text="Auto-Labeling" />
+              </div>
+            </div>
+
+            {/* Visual Side (Right - Animation) */}
+            <div className="order-1 lg:order-2">
+              <DiarizationDemo />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* --- DEMO SECTION (SOAP & RECORDING) --- */}
       <div className="max-w-6xl mx-auto px-6 mt-32 mb-20">
         <div className="bg-white/50 backdrop-blur-xl rounded-[3rem] p-8 md:p-12 border border-[#DBC6AE]/30 relative overflow-hidden">
@@ -448,40 +484,7 @@ function Working() {
         </div>
       </div>
 
-      {/* --- DIARIZATION SECTION (TRANSCRIPT TO SPEECH) --- */}
-      <div className="max-w-6xl mx-auto px-6 mb-32">
-        <div className="bg-white/50 backdrop-blur-xl rounded-[3rem] p-8 md:p-12 border border-[#DBC6AE]/30 relative overflow-hidden">
-          {/* Background Blob */}
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#2E5674]/5 to-[#DBC6AE]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-
-          <div className="grid lg:grid-cols-2 gap-16 items-center relative z-10 text-left">
-
-            {/* Text Side (Left) */}
-            <div className="space-y-6 order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2E5674]/10 text-[#2E5674] font-bold text-sm">
-                <UserCheck size={16} />
-                <span>Speaker Diarization</span>
-              </div>
-              <DiarizationGraphics />
-              <h2 className="text-3xl md:text-4xl font-extrabold text-[#192E46] leading-tight">
-                Who said what? <br /> <span className="text-[#2E5674]">Perfectly Clear.</span>
-              </h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                EchoCare intelligently distinguishes between multiple speakers, separating doctor instructions from patient concerns with high precision.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Badge icon={<User size={14} />} text="Multi-Speaker" />
-                <Badge icon={<Wand2 size={14} />} text="Auto-Labeling" />
-              </div>
-            </div>
-
-            {/* Visual Side (Right - Animation) */}
-            <div className="order-1 lg:order-2">
-              <DiarizationDemo />
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       {/* --- STATISTICS SECTION --- */}
       <div className="max-w-6xl mx-auto px-6 mt-32 mb-20">

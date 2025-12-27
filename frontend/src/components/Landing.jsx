@@ -14,6 +14,12 @@ function Landing() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Scroll to top on reload/mount
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
     axios.post(BACKEND_URL + "/auth/check-login", {}, { withCredentials: true })
       .then(() => {
         navigate("/dashboard")
