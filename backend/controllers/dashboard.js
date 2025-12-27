@@ -188,13 +188,11 @@ ${transcript}
       { AITranscription: AITranscript }
     );
     const consultations = await Consultation.find({ email: email });
-    return res
-      .status(200)
-      .json({
-        msg: "Transcript AI Enhanced",
-        consultations: [...consultations].reverse(),
-        AITranscript: AITranscript,
-      });
+    return res.status(200).json({
+      msg: "Transcript AI Enhanced",
+      consultations: [...consultations].reverse(),
+      AITranscript: AITranscript,
+    });
   } catch (e) {
     console.log(e);
   }
@@ -205,10 +203,21 @@ export const editTitle = async (req, res) => {
   const { id, title } = req.body;
   await Consultation.updateOne({ _id: id }, { title: title });
   const consultations = await Consultation.find({ email: email });
+  return res.status(200).json({
+    msg: "title saved",
+    consultations: [...consultations].reverse(),
+  });
+};
+
+export const deleteConsultation = async (req, res) => {
+  const email = jwt.verify(req.cookies.user, process.env.JWT_SECRET).user;
+  const id = req.body.id;
+  await Consultation.deleteOne({ _id: id });
+  const consultations = await Consultation.find({ email: email });
   return res
     .status(200)
     .json({
-      msg: "title saved",
+      msg: "consultation deleted",
       consultations: [...consultations].reverse(),
     });
 };
