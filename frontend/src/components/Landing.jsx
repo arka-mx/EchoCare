@@ -10,27 +10,27 @@ import { useNavigate } from "react-router-dom";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function Landing() {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
-  useEffect(()=>{
-    axios.post(BACKEND_URL+"/auth/check-login",{},{withCredentials:true})
-    .then(()=>{
-      navigate("/dashboard")
-    })
-    .catch((e)=>{
-      if(e.response.status===401){
-        navigate("/")
-      }
-    })
-  },[navigate]);
+  useEffect(() => {
+    axios.post(BACKEND_URL + "/auth/check-login", {}, { withCredentials: true })
+      .then(() => {
+        navigate("/dashboard")
+      })
+      .catch((e) => {
+        if (e.response.status === 401) {
+          navigate("/")
+        }
+      })
+  }, [navigate]);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-[#F9FcfE] [background-image:radial-gradient(#2E5674_1px,transparent_1px)] [background-size:48px_48px]">
       <LandingNavbar />
-      <Hero/>
-      <Features/>
-      <Working/>
-      <Footer/>
+      <Hero />
+      <Features />
+      <Working />
+      <Footer />
     </div>
   );
 }

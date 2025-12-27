@@ -218,7 +218,7 @@ function Working() {
   }, []);
 
   return (
-    <div className="py-20 overflow-hidden relative bg-gradient-to-b from-white via-[#F9FcfE] to-white" id="how-it-works">
+    <div className="py-20 overflow-hidden relative" id="how-it-works">
 
       {/* --- CAROUSEL SECTION --- */}
       <div className="flex flex-col items-center justify-center mb-16">
@@ -276,7 +276,7 @@ function Working() {
 
       {/* --- TIMELINE SECTION --- */}
       <div className="flex flex-col items-center justify-center mb-16">
-        <h2 className="text-[#DBC6AE] font-bold tracking-widest text-sm uppercase mb-3">Process Flow</h2>
+        <h2 className="text-[#DBC6AE] font-extrabold tracking-widest text-lg uppercase mb-3">Process Flow</h2>
         <h1 className="text-4xl md:text-5xl font-extrabold text-[#192E46] tracking-tight">Detailed Workflow</h1>
       </div>
 
@@ -373,6 +373,90 @@ function Working() {
 
       </div>
 
+      {/* --- STATISTICS SECTION --- */}
+      <div className="max-w-6xl mx-auto px-6 mt-32 mb-20">
+        <div className="grid md:grid-cols-2 gap-8">
+          <StatCard
+            number={200}
+            suffix="+"
+            label="Hours Saved"
+            desc="Saves 200 hours per doctor per year by eliminating manual documentation."
+          />
+          <StatCard
+            number={25}
+            suffix="%"
+            label="No-shows Reduced"
+            desc="Reduces no-shows by 25%, recovering hundreds of billable visits annually."
+          />
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+// Stats Card Component with Animation
+function StatCard({ number, suffix, label, desc }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [hasAnimated]);
+
+  useEffect(() => {
+    if (!hasAnimated) return;
+
+    let start = 0;
+    // Animation duration 2s
+    const duration = 2000;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const now = Date.now();
+      const timePassed = now - startTime;
+      const progress = Math.min(timePassed / duration, 1);
+
+      // Ease out quart
+      const ease = 1 - Math.pow(1 - progress, 4);
+
+      const currentCount = Math.floor(ease * number);
+      setCount(currentCount);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [hasAnimated, number]);
+
+  return (
+    <div
+      ref={ref}
+      className="flex flex-col items-center text-center p-10 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-[#DBC6AE]/20 hover:scale-105 transition-transform duration-500"
+    >
+      <div className="flex items-baseline gap-1 mb-2">
+        <span className="text-6xl md:text-7xl font-extrabold text-[#192E46] tabular-nums tracking-tighter">
+          {count}
+        </span>
+        <span className="text-4xl font-bold text-[#DBC6AE]">{suffix}</span>
+      </div>
+      <h3 className="text-xl font-bold text-[#2E5674] mb-3 uppercase tracking-wide">{label}</h3>
+      <p className="text-gray-500 font-medium leading-relaxed max-w-sm">
+        {desc}
+      </p>
     </div>
   );
 }
