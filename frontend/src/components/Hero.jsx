@@ -54,7 +54,7 @@ function Hero() {
         <br className="hidden md:block" />
         <span className="text-[#2E5674]">
           Without the{" "}
-          <span className="text-[#A68452] font-['Homemade_Apple'] relative inline-block">
+          <span className="text-green-600 font-['Homemade_Apple'] relative inline-block">
             paperwork
             <svg className="absolute w-[120%] h-6 -bottom-2 -left-[10%] pointer-events-none -rotate-1" viewBox="0 0 100 25" preserveAspectRatio="none">
               <path d="M5 18 Q 50 2 95 18" stroke="#192E46" strokeWidth="4" fill="none" strokeLinecap="round" />
