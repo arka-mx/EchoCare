@@ -15,7 +15,6 @@ function Hero() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async () => {
-    console.log("BACKEND_URL:", BACKEND_URL);
     setIsLoggingIn(true);
     try {
       const result = await signInWithPopup(auth, provider);
