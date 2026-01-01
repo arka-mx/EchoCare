@@ -49,7 +49,7 @@ function Hero() {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] pointer-events-none"></div>
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mx-5 mt-3 leading-tight tracking-tight">
-        <span className="text-[#192E46]">AI-powered clinical notes. </span>
+        <span className="text-[#192E46]">AI-assisted clinical notes. </span>
         <br className="hidden md:block" />
         <span className="text-[#2E5674]">
           Without the{" "}
